@@ -56,15 +56,15 @@ services:
 
   web-sockets-svc:
     build:
-      context: ../web-socets-svc
+      context: ../web-sockets-svc
       dockerfile: Dockerfile
     container_name: web-sockets-svc
     ports:
       - '3004:3000'
     env_file:
-      - ../web-socets-svc/.env
+      - ../web-sockets-svc/.env
     volumes:
-      - ../web-socets-svc:/app
+      - ../web-sockets-svc:/app
       - /app/node_modules
     networks:
       - social-network
