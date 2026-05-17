@@ -1,0 +1,125 @@
+services:
+  users-svc:
+    build:
+      context: ../users-svc
+      dockerfile: Dockerfile
+    container_name: users-svc
+    ports:
+      - '3001:3000'
+    env_file:
+      - ../users-svc/.env
+    volumes:
+      - ../users-svc:/app
+      - /app/node_modules
+    networks:
+      - social-network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+
+  posts-svc:
+    build:
+      context: ../posts-svc
+      dockerfile: Dockerfile
+    container_name: posts-svc
+    ports:
+      - '3002:3000'
+    env_file:
+      - ../posts-svc/.env
+    volumes:
+      - ../posts-svc:/app
+      - /app/node_modules
+    networks:
+      - social-network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - mongodb
+
+  notifications-svc:
+    build:
+      context: ../notifications-svc
+      dockerfile: Dockerfile
+    container_name: notifications-svc
+    ports:
+      - '3003:3000'
+    env_file:
+      - ../notifications-svc/.env
+    volumes:
+      - ../notifications-svc:/app
+      - /app/node_modules
+    networks:
+      - social-network
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+
+  web-sockets-svc:
+    build:
+      context: ../web-socets-svc
+      dockerfile: Dockerfile
+    container_name: web-sockets-svc
+    ports:
+      - '3004:3000'
+    env_file:
+      - ../web-socets-svc/.env
+    volumes:
+      - ../web-socets-svc:/app
+      - /app/node_modules
+    networks:
+      - social-network
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: social_network
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - social-network
+
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: mongo123
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - social-network
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    restart: unless-stopped
+    ports:
+      - '8081:8081'
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: mongo123
+      ME_CONFIG_MONGODB_URL: mongodb://root:mongo123@mongodb:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin123
+    depends_on:
+      - mongodb
+    networks:
+      - social-network
+
+networks:
+  social-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  mongodb_data:
