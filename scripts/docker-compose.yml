@@ -56,7 +56,7 @@ services:
 
   web-sockets-svc:
     build:
-      context: ../web-sockets-svc
+      context: ../web-sockets
       dockerfile: Dockerfile
     container_name: web-sockets-svc
     ports:
@@ -64,7 +64,7 @@ services:
     env_file:
       - ../web-sockets-svc/.env
     volumes:
-      - ../web-sockets-svc:/app
+      - ../web-socets-svc:/app
       - /app/node_modules
     networks:
       - social-network
